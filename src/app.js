@@ -1,13 +1,14 @@
 const express = require("express");
 const { connectDB } = require("./config/database");
 const { UserModel } = require("./model/user");
-const {signup,updateUser,deleteUser} = require('./routes')
+const {signup,updateUser,deleteUser,userServer} = require('./routes')
 
 const app = express();
 app.use(express.json());
 app.use(signup)
 app.use(updateUser)
 app.use(deleteUser)
+app.use(userServer)
 
 // app.post("/signup", async (req, res) => {
 //   const user = new UserModel(req.body);

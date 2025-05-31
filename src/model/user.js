@@ -4,9 +4,9 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      //   required:true,
-      // minLength: 3,
-      // maxLength: 20,
+        required:true,
+      minLength: 3,
+      maxLength: 20,
     },
     lastName: {
       type: String,
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      //   required:true,
+        required:true,
       lowercase: true,
       trim: true,
       unique: true,
@@ -33,12 +33,11 @@ const userSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: ["male", "female", "other"],
-      // required: true,
     },
     password: {
       type: String,
-      // required:true,
-      select: false,
+      required:true,
+      // select: false, 
     },
     imageUrl: {
       type: String,
