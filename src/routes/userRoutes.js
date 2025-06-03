@@ -1,58 +1,10 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-const { loginValidation, signupValidation } = require("../utils/validation");
 const { UserModel } = require("../model/user");
 const { userAuth } = require("../middleware/auth");
-const userServer = express();
-userServer.use(express.json());
-userServer.use(cookieParser());
-
-userServer.post("/login", async (req, res) => {
-  try {
-    const user = await loginValidation(req);
-    const token = jwt.sign({ _id: user._id }, "8494076802!aB");
-    res.cookie("token", token);
-    res.send("login successfull");
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
-});
-
-userServer.post("/signup", async (req, res) => {
-  const { firstName, lastName, email, gender, age, password } = req.body;
-  try {
-    //VALIDATION
-    signupValidation(req);
-    // const requiredFields = ["firstName", "email", "password"];
-    // const isValidRequest = requiredFields.every((field) =>
-    //   req.body.hasOwnProperty(field)
-    // );
-    // if (!isValidRequest) {
-    //   throw new Error("Bad request  missing required fields");
-    // }
-
-    // ENCRYPTING THE PASSWORD
-    const encryptedPassword = await bcrypt.hash(password, 10);
-
-    // SAVING TO DB
-    const userData = new UserModel({
-      firstName,
-      lastName,
-      email,
-      gender,
-      age,
-      password: encryptedPassword,
-    });
-    await userData.save();
-    res.send("user created successfully");
-  } catch (err) {
-    // console.log(err);
-
-    res.send("Error " + err.message);
-  }
-});
+const userServer = express.Router();
+// userServer.use(express.json());
 
 userServer.get("/profile", userAuth, async (req, res) => {
   const user = res.user;

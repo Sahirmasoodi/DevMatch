@@ -55,4 +55,18 @@ const loginValidation = async (req) => {
   return user;
 };
 
-module.exports = { signupValidation, loginValidation };
+const passwordValidation = function (req) {
+  const { currentPassword, newPassword, confirmNewPassword } = req.body;
+
+  if (!currentPassword || !newPassword || !confirmNewPassword) {
+    throw new Error("Bad Request");
+  }
+  if (currentPassword == newPassword) {
+    throw new Error("Use different password");
+  }
+  if (newPassword != confirmNewPassword) {
+    throw new Error("Passwords do not match.");
+  }
+};
+
+module.exports = { signupValidation, loginValidation, passwordValidation };

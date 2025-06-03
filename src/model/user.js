@@ -1,29 +1,33 @@
+const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const validator = require("validator");
 const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-        required:true,
+      required: true,
       minLength: 3,
       maxLength: 20,
+      lowercase:true
     },
     lastName: {
       type: String,
       minLength: 3,
       maxLength: 20,
+      lowercase:true
     },
     email: {
       type: String,
-        required:true,
+      required: true,
       lowercase: true,
       trim: true,
+      lowercase:true,
       unique: true,
       // match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
       validate(value) {
-       if (!validator.isEmail(value)) {
-          throw new Error('invalid email id')
-       } 
+        if (!validator.isEmail(value)) {
+          throw new Error("invalid email id");
+        }
       },
     },
     age: {
@@ -36,8 +40,8 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required:true,
-      // select: false, 
+      required: true,
+      // select: false,
     },
     imageUrl: {
       type: String,
@@ -53,5 +57,11 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// userSchema.methods.generateToekn = function () {
+//   const user = this;
+//   const token = jwt.sign({ _id: user._id }, "8494076802!aB",{expiresIn:"7d"});
+//   return token
+
+// };
 const UserModel = mongoose.model("user", userSchema);
 module.exports = { UserModel };
