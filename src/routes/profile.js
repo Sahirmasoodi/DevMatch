@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { userAuth } = require("../middleware/auth");
 const profileRoute = express.Router();
 const validator = require("validator");
+const { passwordValidation } = require("../utils/validation");
 
 profileRoute.get("/profile", userAuth, async (req, res) => {
   const user = res.user;
@@ -58,7 +59,11 @@ profileRoute.patch("/changePassword", userAuth, async (req, res) => {
   const { currentPassword, newPassword, confirmNewPassword } = req.body;
   const loggedinUser = res.user;
   try {
-    passwordValidation(req)
+   await passwordValidation(req,loggedinUser)
+    const newEncryptedPassword =await bcrypt.hash(newPassword,10)
+    loggedinUser.password = newEncryptedPassword
+   await loggedinUser.save()
+    res.send('password updated successfully')
     
   } catch (error) {
     res.status(400).send(error.message);

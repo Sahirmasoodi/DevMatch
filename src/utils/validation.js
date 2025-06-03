@@ -55,17 +55,25 @@ const loginValidation = async (req) => {
   return user;
 };
 
-const passwordValidation = function (req) {
+const passwordValidation = async function (req, loggedinUser) {
   const { currentPassword, newPassword, confirmNewPassword } = req.body;
-
+  // console.log(loggedinUser);
+  
   if (!currentPassword || !newPassword || !confirmNewPassword) {
     throw new Error("Bad Request");
+  }
+  const isCurrentPasswordMatch = await bcrypt.compare(currentPassword,loggedinUser.password)
+  if (!isCurrentPasswordMatch) {
+    throw new Error("current password does not match");
+  }
+  if (!validator.isStrongPassword(newPassword)) {
+    throw new Error("use strong new password");
   }
   if (currentPassword == newPassword) {
     throw new Error("Use different password");
   }
   if (newPassword != confirmNewPassword) {
-    throw new Error("Passwords do not match.");
+    throw new Error("new Passwords do not match.");
   }
 };
 
