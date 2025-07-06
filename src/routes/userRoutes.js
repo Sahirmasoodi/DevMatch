@@ -60,7 +60,7 @@ userServer.patch("/updateUser/:id", userAuth, async (req, res) => {
   }
 });
 
-userServer.get("/getUsers", userAuth, async (req, res) => {
+userServer.get("/getUsers", async (req, res) => {
   try {
     const users = await UserModel.find({});
 

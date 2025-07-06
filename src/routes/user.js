@@ -12,11 +12,8 @@ userRoutes.get("/user/requests/recieved", userAuth, async (req, res) => {
     const recievedRequests = await ConnectionRequestModel.find({
       toUserId: loggedInUser._id,
       status: "interested",
-    }).populate("fromUserId", ["firstName", "lastName"]);
+    }).populate("fromUserId", ["firstName", "lastName","imageUrl"]);
 
-    if (recievedRequests.length == 0) {
-      return res.send({ message: "you dont have any requests" });
-    }
     res.json({ data: recievedRequests });
   } catch (error) {
     res.status(400).json({ message: "something went wrong" });
@@ -35,10 +32,10 @@ userRoutes.get("/user/connections", userAuth, async (req, res) => {
       .populate("fromUserId", ["firstName", "lastName", "imageUrl"])
       .populate("toUserId", ["firstName", "lastName", "imageUrl"]);
 
-    if (userConnections.length == 0) {
-      return res.send("zero connections");
-    }
-    console.log(userConnections);
+    // if (userConnections.length == 0) {
+    //   return res.json({message:"you dont have any connections yet!"});
+    // }
+    // console.log(userConnections);
 
     const filteredData = userConnections.map((d) => {
       if (d.fromUserId._id.equals(loggedInUser._id)) {
@@ -57,12 +54,13 @@ userRoutes.get("/user/connections", userAuth, async (req, res) => {
 userRoutes.get("/user/feed", userAuth, async (req, res) => {
   try {
     const loggedInUser = res.user;
-    const page = Number(req.query?.page) || 0
-    let limit = Number(req.query?.limit) || 10
-    limit = limit>20 ? 20 : limit
-    const skip = (page-1)*limit
-    console.log(limit);
+    const page = Number(req.query?.page) || 0;
+    let limit = Number(req.query?.limit) || 10;
+    limit = limit > 50 ? 50 : limit;
+    let skip = (page - 1) * limit;
+    skip = skip < 0 ? 0 :skip
     
+
     const connectionRequests = await ConnectionRequestModel.find({
       $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
     });
@@ -78,11 +76,13 @@ userRoutes.get("/user/feed", userAuth, async (req, res) => {
         { _id: { $nin: Array.from(excludeFromFeed) } },
         { _id: { $ne: loggedInUser._id } },
       ],
-    }).select("firstName lastName imageUrl").skip(skip).limit(limit)
+    })
+      .select("firstName lastName imageUrl about")
+      .skip(skip)
+      .limit(limit);
 
     res.json({ data: feedData });
-  } 
-  catch (error) {
+  } catch (error) {
     res.json({ message: error.message });
   }
 });

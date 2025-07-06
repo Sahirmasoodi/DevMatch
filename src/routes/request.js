@@ -42,7 +42,9 @@ connectionRouter.post(
         status,
       });
       await connectionRequest.save();
-      res.json({ message: "request sent successfully", status: 200 });
+      
+      if(status =='ignored') res.json({ message: "request ignored", status: 200 });
+      if(status == 'interested') res.json({ message: "request sent successfully", status: 200 });
     } catch (error) {
       res.status(400).json({ message: error.message, status: 400 });
     }
@@ -71,5 +73,25 @@ console.log(status);
 
 res.send(`connection request ${status}`)
 })
+
+// connectionRouter.get('/requests/received',userAuth,async(req,res)=>{
+//  const loggedInUser = res.user 
+// //  console.log(loggedInUser);
+
+//   try {
+//     const recievedRequests = await ConnectionRequestModel.find({
+//         toUserId:loggedInUser._id,
+//         status:'interested'
+
+//     }).populate('fromUserId',"firstName lastName imageUrl").select('fromUserId')
+//     if (recievedRequests.length == 0 ) {
+//       return res.send({message:"zero connection requests"})
+//     }
+    
+//     res.send(recievedRequests)
+//   } catch (error) {
+//     res.send(error)
+//   }
+// })
 
 module.exports = connectionRouter;

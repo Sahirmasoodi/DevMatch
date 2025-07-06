@@ -5,14 +5,15 @@ const { loginValidation, signupValidation } = require("../utils/validation");
 const { UserModel } = require("../model/user");
 const authRouter = express.Router();
 
-
-
 authRouter.post("/login", async (req, res) => {
   try {
     const user = await loginValidation(req);
     const token = jwt.sign({ _id: user._id }, "8494076802!aB");
-    res.cookie("token", token);
-    res.send("login successfull");
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 8 * 3600000),
+    });
+
+    res.send(user);
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -49,11 +50,24 @@ authRouter.post("/signup", async (req, res) => {
       imageUrl,
       skills,
     });
-    await userData.save();
-    res.send("user created successfully");
+    const savedUser = await userData.save();
+    const token = await savedUser.generateToken(); // generateToken() is defined as model in UserModel
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 8 * 36000000),
+    });
+    res.send(savedUser);
   } catch (err) {
-    res.send("Error " + err.message);
+    res.status(400).send("Error " + err.message);
   }
 });
 
-module.exports = authRouter
+authRouter.post("/logout", async (req, res) => {
+  // res.cookie("token",null,{
+  //   expires:new Date(Date.now())
+  // });
+  res.clearCookie("token");
+
+  res.status(200).json({ message: "Logout successful" });
+});
+
+module.exports = authRouter;

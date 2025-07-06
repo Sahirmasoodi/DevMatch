@@ -36,6 +36,7 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
+      lowercase:true,
       enum: {
         values:["male", "female"],
         message:`{VALUE}gender is not valid`
@@ -49,7 +50,11 @@ const userSchema = new mongoose.Schema(
     imageUrl: {
       type: String,
       default:
-        "https://t4.ftcdn.net/jpg/09/17/12/23/360_F_917122367_kSpdpRJ5Hcmn0s4WMdJbSZpl7NRzwupU.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0mStgAq6UphPdQDqvAGbl9Usi9LSqi1-URQ&s",
+    },
+    skills:{
+      type : [String],
+      default:['Html','Css','JavaScript']
     },
     about: {
       type: String,
@@ -60,11 +65,11 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// userSchema.methods.generateToekn = function () {
-//   const user = this;
-//   const token = jwt.sign({ _id: user._id }, "8494076802!aB",{expiresIn:"7d"});
-//   return token
+userSchema.methods.generateToken = function () {
+  const user = this;
+  const token = jwt.sign({ _id: user._id }, "8494076802!aB",{expiresIn:"7d"});
+  return token
 
-// };
+};
 const UserModel = mongoose.model("user", userSchema);
 module.exports = { UserModel };

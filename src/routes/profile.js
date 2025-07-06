@@ -5,7 +5,7 @@ const profileRoute = express.Router();
 const validator = require("validator");
 const { passwordValidation } = require("../utils/validation");
 
-profileRoute.get("/profile", userAuth, async (req, res) => {
+profileRoute.get("/user/profile", userAuth, async (req, res) => {
   const user = res.user;
   try {
     res.send(user);
@@ -15,7 +15,7 @@ profileRoute.get("/profile", userAuth, async (req, res) => {
 });
 
 profileRoute.patch("/editProfile", userAuth, async (req, res) => {
-  const { firstName, lastName, gender, age, about, imageUrl } = req.body;
+  const { firstName, lastName, gender, age, about, imageUrl,skills } = req.body;
   const looggedinUser = res.user;
   try {
     const allowedUpdates = [
@@ -25,18 +25,20 @@ profileRoute.patch("/editProfile", userAuth, async (req, res) => {
       "age",
       "about",
       "imageUrl",
+      "skills"
     ];
     const isUpdateAllowed = Object.keys(req.body).every((key) =>
       allowedUpdates.includes(key)
     );
-
+    // console.log(Object.keys(req.body));
+    
     if (imageUrl && !validator.isURL(imageUrl)) {
       throw new Error("invalid URL");
     }
-    if (about && about.length > 10) {
+    if (about && about.length > 150) {
       throw new Error("max length of 100 chars for about");
     }
-
+    
     if (isUpdateAllowed) {
       Object.keys(req.body).forEach(
         (key) => (looggedinUser[key] = req.body[key])
@@ -48,10 +50,10 @@ profileRoute.patch("/editProfile", userAuth, async (req, res) => {
         status: 200,
       });
     } else {
-      throw new Error("Bad request");
+      throw new Error("update not allowed");
     }
   } catch (error) {
-    res.status(400).send(error.message);
+   res.status(400).send({ message: error.message })
   }
 });
 

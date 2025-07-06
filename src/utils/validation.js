@@ -3,8 +3,8 @@ const { UserModel } = require("../model/user");
 const bcrypt = require("bcrypt");
 
 const signupValidation = (req) => {
-  const { firstName, lastName, email, gender, age, password, imageUrl } =
-    req.body;
+  const { firstName, lastName, email, gender, age, password, imageUrl,about } = req.body;
+  const validGender = ['male','female']
   if (!firstName || !email || !password) {
     throw new Error("Bad Request");
   }
@@ -14,8 +14,7 @@ const signupValidation = (req) => {
   if (imageUrl ? !validator.isURL(imageUrl) : false) {
     throw new Error("invalid url");
   }
-  if (
-    !validator.isStrongPassword(password, {
+  if ( !validator.isStrongPassword(password, {
       minLength: 8,
       minLowercase: 1,
       minUppercase: 1,
@@ -26,6 +25,14 @@ const signupValidation = (req) => {
     throw new Error(
       "Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol."
     );
+  }
+  if (gender && !validGender.includes(gender)) {
+    throw new Error("invalid gender");
+    
+  }
+  if (about && about.length >150) {
+    throw new Error("about exceeded char length");
+    
   }
 };
 
@@ -42,7 +49,7 @@ const loginValidation = async (req) => {
 
   const user = await UserModel.findOne({ email });
 
-  if (!user || !user.password) {
+  if (!user) {
     throw new Error("Invalid credentials."); // Do not expose if user exists or not
   }
 
